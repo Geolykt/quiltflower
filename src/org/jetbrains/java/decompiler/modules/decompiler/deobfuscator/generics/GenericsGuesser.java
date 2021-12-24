@@ -14,6 +14,7 @@ import org.jetbrains.java.decompiler.main.ClassesProcessor;
 import org.jetbrains.java.decompiler.main.ClassesProcessor.ClassNode;
 import org.jetbrains.java.decompiler.main.DecompilerContext;
 import org.jetbrains.java.decompiler.main.extern.IFernflowerLogger.Severity;
+import org.jetbrains.java.decompiler.struct.StructContext;
 import org.jetbrains.java.decompiler.struct.StructField;
 import org.jetbrains.java.decompiler.struct.StructMethod;
 import org.jetbrains.java.decompiler.struct.consts.ConstantPool;
@@ -25,8 +26,11 @@ public class GenericsGuesser implements CodeConstants {
   /**
    * A hardcoded set of implementations of the {@link Iterable} interface that
    * apply for generics checking later on. As this set is hardcoded, using it
-   * directly is not really recommended as changing the implementation might be
-   * beneficial in the future. Use {@link #isIterable(String)} instead.
+   * directly is not really recommended. Use {@link #isIterable(String)} instead.
+   *
+   * This collection is purely meant to be used in instances where the JRE
+   * is not on the decompile classpath and where as such {@link StructContext#instanceOf(String, String)}
+   * does not work.
    */
   private static final Set<String> ITERABLES = new HashSet<String>() {
     private static final long serialVersionUID = -3779578266088390365L;
@@ -64,15 +68,25 @@ public class GenericsGuesser implements CodeConstants {
    * This descriptor has to be in the format "L.+;" in order to match,
    * however this method should accept any string not obeying the format (e.g. "F"),
    * though it strictly needs to return false in this case.
+   * Arrays also do not match.
    *
-   * By default this method uses a hardcoded set of implementations of the Iterable interface
-   * that are present in Java 11. This includes interfaces and the Iterable interface itself.
+   * The current implementation first matches the descriptor against a set of hardcoded iterables,
+   * then makes use of {@link StructContext#instanceOf(String, String)}.
+   * As such this method has the highest yield if there are more libraries put on the decompile path.
+   * However it also does not outright break if the JRE is not listed as a library.
    *
    * @param descriptor The descriptor to check
    * @return Whether the descriptor is an iterable
    */
   public boolean isIterable(String descriptor) {
-    return ITERABLES.contains(descriptor);
+    if (ITERABLES.contains(descriptor)) {
+      return true;
+    }
+    if (descriptor.codePointAt(0) != 'L') {
+      return false; // descriptor is a primitive or something
+    }
+    String internalName = descriptor.substring(1, descriptor.length() - 1);
+    return DecompilerContext.getStructContext().instanceOf(internalName, "java/lang/Iterable");
   }
 
   public void guessGenerics(ClassesProcessor classProcessor) {
