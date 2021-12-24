@@ -9,7 +9,6 @@ import org.jetbrains.java.decompiler.struct.attr.StructGenericSignatureAttribute
 import org.jetbrains.java.decompiler.struct.consts.ConstantPool;
 import org.jetbrains.java.decompiler.struct.gen.generics.GenericFieldDescriptor;
 import org.jetbrains.java.decompiler.struct.gen.generics.GenericMain;
-import org.jetbrains.java.decompiler.struct.gen.generics.GenericMethodDescriptor;
 import org.jetbrains.java.decompiler.util.DataInputFullStream;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class StructField extends StructMember {
 
   private final String name;
   private final String descriptor;
-  private final GenericFieldDescriptor signature;
+  private GenericFieldDescriptor signature;
   private final BytecodeVersion version;
 
   protected StructField(int accessFlags, Map<String, StructGeneralAttribute> attributes, String name, String descriptor, BytecodeVersion version) {
@@ -76,6 +75,15 @@ public class StructField extends StructMember {
 
   public GenericFieldDescriptor getSignature() {
     return signature;
+  }
+
+  /**
+   * Retroactively sets the signature of this field.
+   *
+   * @param signature The new signature of the field
+   */
+  public void setSignature(GenericFieldDescriptor signature) {
+    this.signature = signature;
   }
 
   @Override

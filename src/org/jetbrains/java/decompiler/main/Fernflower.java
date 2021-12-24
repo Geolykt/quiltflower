@@ -3,6 +3,7 @@ package org.jetbrains.java.decompiler.main;
 
 import org.jetbrains.java.decompiler.main.ClassesProcessor.ClassNode;
 import org.jetbrains.java.decompiler.main.extern.*;
+import org.jetbrains.java.decompiler.modules.decompiler.deobfuscator.generics.GenericsGuesser;
 import org.jetbrains.java.decompiler.modules.renamer.ConverterHelper;
 import org.jetbrains.java.decompiler.modules.renamer.IdentifierConverter;
 import org.jetbrains.java.decompiler.modules.renamer.PoolInterceptor;
@@ -114,6 +115,10 @@ public class Fernflower implements IDecompiledData {
     }
 
     classProcessor.loadClasses(helper);
+
+    if (DecompilerContext.getOption(IFernflowerPreferences.GUESS_GENERIC_SIGNATURES)) {
+      new GenericsGuesser().guessGenerics(classProcessor);
+    }
 
     structContext.saveContext();
   }

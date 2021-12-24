@@ -41,6 +41,7 @@ public interface IFernflowerPreferences {
   String SWITCH_EXPRESSIONS = "swe";
   String SHOW_HIDDEN_STATEMENTS = "shs";
   String OVERRIDE_ANNOTATION = "ovr";
+  String GUESS_GENERIC_SIGNATURES = "ggs";
 
   String INCLUDE_ENTIRE_CLASSPATH = "iec";
   String INCLUDE_JAVA_RUNTIME = "jrt";
@@ -106,6 +107,7 @@ public interface IFernflowerPreferences {
     defaults.put(VERIFY_ANONYMOUS_CLASSES, "0");
     defaults.put(TERNARY_CONSTANT_SIMPLIFICATION, "0");
     defaults.put(OVERRIDE_ANNOTATION, "1");
+    defaults.put(GUESS_GENERIC_SIGNATURES, "0"); // There is no reason to enable generics guessing by default if generics decompilation is disabled by default
     defaults.put(PATTERN_MATCHING, "0"); // Pattern matching has some issues around negative blocks
     defaults.put(EXPERIMENTAL_TRY_LOOP_FIX, "0"); // Causes issues when decompiling certain classes
     defaults.put(TERNARY_CONDITIONS, "1"); // Ternary conditions are pretty stable so they can go in here
